@@ -1,5 +1,6 @@
 package dev.doeshing.koukeNekoKO;
 
+import dev.doeshing.koukeNekoKO.commands.GiveUpCommand;
 import dev.doeshing.koukeNekoKO.commands.ReloadCommand;
 import dev.doeshing.koukeNekoKO.core.CommandSystem;
 import dev.doeshing.koukeNekoKO.core.bleeding.BleedingListener;
@@ -20,14 +21,15 @@ public final class KoukeNekoKO extends JavaPlugin {
         // 註冊事件監聽器
         getServer().getPluginManager().registerEvents(new BleedingListener(this, bleedingManager), this);
 
-        // 使用 CommandSystem 註冊 reload 指令
+        // 使用 CommandSystem 註冊指令
         CommandSystem commandSystem = new CommandSystem(this);
-        commandSystem.registerCommand("koukenekokoreload", new ReloadCommand(this), "koukeneko.ko.admin", "過載外掛設定", "/koukenekokoreload", "knkoreload");
+        commandSystem.registerCommand("koukenekokoreload", new ReloadCommand(this), "koukeneko.ko.admin", "重載插件設定", "/koukenekokoreload", "knkoreload");
+        commandSystem.registerCommand("giveup", new GiveUpCommand(this), "", "放棄急救並立即死亡", "/giveup", "surrender", "die", "ko");
 
         // 輸出啟動資訊
-        getLogger().info("KoukeNeko-KO 外掛已啟動！");
+        getLogger().info("KoukeNeko-KO 插件已啟動！");
         getLogger().info("瀕死持續時間: " + getConfig().getInt("bleeding.duration", 60) + " 秒");
-        getLogger().info("救援點選次數: " + getConfig().getInt("bleeding.revival-clicks", 5) + " 次");
+        getLogger().info("救援點擊次數: " + getConfig().getInt("bleeding.revival-clicks", 5) + " 次");
     }
 
     @Override
@@ -38,11 +40,11 @@ public final class KoukeNekoKO extends JavaPlugin {
         }
 
         // 輸出關閉資訊
-        getLogger().info("KoukeNeko-KO 外掛已關閉！");
+        getLogger().info("KoukeNeko-KO 插件已關閉！");
     }
 
     /**
-     * 獲取瀕死管理器例項
+     * 獲取瀕死管理器實例
      * @return 瀕死管理器
      */
     public BleedingManager getBleedingManager() {

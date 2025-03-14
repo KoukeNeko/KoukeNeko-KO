@@ -28,7 +28,7 @@ public class BleedingManager {
      * @param text 含有 &color 代碼的文字
      * @return 已處理的 Component
      */
-    private Component formatText(String text) {
+    public Component formatText(String text) {
         if (text == null) return Component.empty();
         return LegacyComponentSerializer.legacyAmpersand().deserialize(text);
     }

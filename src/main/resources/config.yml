@@ -30,6 +30,7 @@ bleeding:
     bleeding-rescue: "&a玩家 {player} 正在救援你！還需 {clicks} 次點選。"
     bleeding-rescued: "&a你已被 {player} 成功救援！"
     bleeding-death: "&c你因失血過多而死亡！"
+    give-up: "&c你已放棄急救，即將死亡..."
 
     rescuer-start: "&a你正在救援 {player}！還需 {clicks} 次點選。"
     rescuer-success: "&a你成功救援了 {player}！"
