@@ -75,7 +75,7 @@ public class BleedingManager {
             Component title = formatText(titleRaw);
             Component subtitle = formatText(subtitleRaw);
             
-            // 使用非已棄用的 Title API
+
             Title titleObj = Title.title(
                 title, 
                 subtitle, 
