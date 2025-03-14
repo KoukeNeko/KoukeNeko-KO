@@ -1,0 +1,4 @@
+name: KoukeNeko-KO
+version: '1.0-SNAPSHOT'
+main: dev.doeshing.koukeNekoKO.KoukeNekoKO
+api-version: '1.21'
