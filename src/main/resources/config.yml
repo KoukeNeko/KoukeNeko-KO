@@ -1,0 +1,37 @@
+# KoukeNeko-KO 外掛配置檔案
+
+# 瀕死相關設定
+bleeding:
+  # 瀕死時間（秒）
+  duration: 60
+
+  # 救援點選次數
+  revival-clicks: 5
+
+  # 瀕死狀態特效
+  effects:
+    # 是否在瀕死玩家頭上顯示標題
+    title: true
+    title-text: "&c你正在流血！"
+    subtitle-text: "&e需要隊友救援！"
+
+    # 是否在瀕死玩家頭上顯示粒子效果
+    particles: true
+
+    # 是否在瀕死時發出音效
+    sound: true
+
+  # 瀕死狀態下玩家能否移動
+  can-move: false
+
+  # 救援提示資訊
+  messages:
+    bleeding-start: "&c你進入了瀕死狀態！你有 {time} 秒等待救援，否則將會死亡。"
+    bleeding-rescue: "&a玩家 {player} 正在救援你！還需 {clicks} 次點選。"
+    bleeding-rescued: "&a你已被 {player} 成功救援！"
+    bleeding-death: "&c你因失血過多而死亡！"
+
+    rescuer-start: "&a你正在救援 {player}！還需 {clicks} 次點選。"
+    rescuer-success: "&a你成功救援了 {player}！"
+    
+    cannot-rescue-self: "&c你不能救援自己！"
