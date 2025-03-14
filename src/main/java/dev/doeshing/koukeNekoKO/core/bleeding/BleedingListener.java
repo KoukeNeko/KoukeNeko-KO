@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class BleedingListener implements Listener {
     private final KoukeNekoKO plugin;
@@ -93,8 +94,23 @@ public class BleedingListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         // 玩家死亡後，確保移除瀕死狀態（防止狀態殘留）
         Player player = event.getEntity();
+        
+        // 如果有處理死亡標記，跳過處理以避免無限遞迴
+        if (player.hasMetadata("processingDeath")) {
+            return;
+        }
+        
         if (bleedingManager.isPlayerBleeding(player.getUniqueId())) {
-            bleedingManager.endBleeding(player.getUniqueId(), false);
+            // 設置正在處理死亡的標記
+            player.setMetadata("processingDeath", new FixedMetadataValue(plugin, true));
+            
+            try {
+                // 從瀕死管理器中移除玩家（不嘗試殺死玩家，因為玩家已經死了）
+                bleedingManager.removeBleedingState(player.getUniqueId());
+            } finally {
+                // 確保一定會移除標記
+                player.removeMetadata("processingDeath", plugin);
+            }
         }
     }
 }

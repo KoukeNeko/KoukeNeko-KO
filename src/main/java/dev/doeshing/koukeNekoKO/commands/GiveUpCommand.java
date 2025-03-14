@@ -1,12 +1,14 @@
 package dev.doeshing.koukeNekoKO.commands;
 
 import dev.doeshing.koukeNekoKO.KoukeNekoKO;
+import dev.doeshing.koukeNekoKO.core.bleeding.BleedingPlayerData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 public class GiveUpCommand implements CommandExecutor {
@@ -39,8 +41,25 @@ public class GiveUpCommand implements CommandExecutor {
         // 播放死亡前的音效
         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_WITHER_DEATH, 0.5f, 1.5f);
         
-        // 執行結束瀕死狀態（不是被救援）
-        plugin.getBleedingManager().endBleeding(player.getUniqueId(), false);
+        // 先清除瀕死狀態但不觸發死亡事件
+        player.setMetadata("processingDeath", new org.bukkit.metadata.FixedMetadataValue(plugin, true));
+        
+        try {
+            // 恢復玩家原始位置和視角
+            BleedingPlayerData data = plugin.getBleedingManager().getBleedingPlayers().get(player.getUniqueId());
+            if (data != null && data.getOriginalLocation() != null) {
+                player.teleport(data.getOriginalLocation());
+            }
+            
+            // 安全地移除瀕死狀態
+            plugin.getBleedingManager().removeBleedingState(player.getUniqueId());
+            
+            // 然後手動設置死亡 - 這會觸發死亡事件但玩家已經不在瀕死狀態
+            player.setHealth(0);
+        } finally {
+            // 確保移除標記
+            player.removeMetadata("processingDeath", plugin);
+        }
 
         return true;
     }

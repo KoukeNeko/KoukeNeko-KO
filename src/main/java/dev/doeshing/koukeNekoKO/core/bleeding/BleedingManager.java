@@ -3,12 +3,16 @@ package dev.doeshing.koukeNekoKO.core.bleeding;
 import dev.doeshing.koukeNekoKO.KoukeNekoKO;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.time.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +75,17 @@ public class BleedingManager {
             Component title = formatText(titleRaw);
             Component subtitle = formatText(subtitleRaw);
             
-            player.showTitle(net.kyori.adventure.title.Title.title(title, subtitle));
+            // 使用非已棄用的 Title API
+            Title titleObj = Title.title(
+                title, 
+                subtitle, 
+                Title.Times.times(
+                    Duration.ofMillis(500),  // fade in
+                    Duration.ofSeconds(5),   // stay
+                    Duration.ofMillis(500)   // fade out
+                )
+            );
+            player.showTitle(titleObj);
         }
 
         // 播放音效
@@ -188,14 +202,7 @@ public class BleedingManager {
         }
 
         // 恢復玩家狀態
-        player.setInvulnerable(false);
-        player.setWalkSpeed(0.2f); // 恢復預設行走速度
-        player.setFlySpeed(0.1f);  // 恢復預設飛行速度
-        
-        // 移除所有瀕死狀態的藥水效果
-        player.removePotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS);
-        player.removePotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS);
-        player.removePotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS);
+        restorePlayerState(player);
         
         // 恢復玩家原始位置和視角
         if (data.getOriginalLocation() != null) {
@@ -204,7 +211,7 @@ public class BleedingManager {
 
         if (rescued) {
             // 如果被救援，恢復一半的生命值
-            double maxHealth = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
+            double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.MAX_HEALTH)).getValue();
             player.setHealth(Math.max(1.0, maxHealth / 2));
 
             // 顯示被救援訊息
@@ -360,5 +367,49 @@ public class BleedingManager {
             endBleeding(playerId, false);
         }
         bleedingPlayers.clear();
+    }
+    
+    /**
+     * 恢復玩家的正常狀態，清除所有瀕死效果
+     * @param player 要恢復狀態的玩家
+     */
+    private void restorePlayerState(Player player) {
+        // 恢復玩家狀態
+        player.setInvulnerable(false);
+        player.setWalkSpeed(0.2f); // 恢復預設行走速度
+        player.setFlySpeed(0.1f);  // 恢復預設飛行速度
+        
+        // 移除所有瀕死狀態的藥水效果
+        player.removePotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS);
+        player.removePotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS);
+        player.removePotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS);
+    }
+    
+    /**
+     * 安全地移除玩家的瀕死狀態，不會將玩家生命值設為 0
+     * 適用於玩家已經死亡的場合
+     * 
+     * @param playerId 玩家UUID
+     */
+    public void removeBleedingState(UUID playerId) {
+        BleedingPlayerData data = bleedingPlayers.get(playerId);
+        if (data == null) {
+            return;
+        }
+
+        // 取消計時器任務
+        if (data.getTimerTask() != null) {
+            data.getTimerTask().cancel();
+        }
+
+        // 從線上玩家獲取Player物件
+        Player player = plugin.getServer().getPlayer(playerId);
+        if (player != null && player.isOnline()) {
+            // 恢復玩家狀態
+            restorePlayerState(player);
+        }
+
+        // 移除瀕死狀態
+        bleedingPlayers.remove(playerId);
     }
 }
