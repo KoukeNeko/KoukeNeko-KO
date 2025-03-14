@@ -1,6 +1,8 @@
 package dev.doeshing.koukeNekoKO.core.bleeding;
 
 import org.bukkit.Location;
+import org.bukkit.boss.BossBar;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.UUID;
@@ -15,6 +17,9 @@ public class BleedingPlayerData {
     private int remainingClicks;
     private BukkitTask timerTask;
     private UUID lastRescuer;
+    private BossBar bleedingBossBar; // 瀕死玩家的BossBar
+    private BossBar rescuerBossBar; // 救援者的BossBar
+    private TextDisplay countdownDisplay; // 頭頂顯示的倒數計時
 
     /**
      * 建立一個瀕死玩家資料
@@ -105,5 +110,53 @@ public class BleedingPlayerData {
      */
     public void setOriginalLocation(Location originalLocation) {
         this.originalLocation = originalLocation;
+    }
+
+    /**
+     * 獲取瀕死玩家的BossBar
+     * @return 瀕死玩家的BossBar
+     */
+    public BossBar getBleedingBossBar() {
+        return bleedingBossBar;
+    }
+
+    /**
+     * 設定瀕死玩家的BossBar
+     * @param bleedingBossBar 瀕死玩家的BossBar
+     */
+    public void setBleedingBossBar(BossBar bleedingBossBar) {
+        this.bleedingBossBar = bleedingBossBar;
+    }
+
+    /**
+     * 獲取救援者的BossBar
+     * @return 救援者的BossBar
+     */
+    public BossBar getRescuerBossBar() {
+        return rescuerBossBar;
+    }
+
+    /**
+     * 設定救援者的BossBar
+     * @param rescuerBossBar 救援者的BossBar
+     */
+    public void setRescuerBossBar(BossBar rescuerBossBar) {
+        this.rescuerBossBar = rescuerBossBar;
+    }
+    
+    /**
+     * 獲取頭頂倒數計時顯示
+     * @return 頭頂倒數計時TextDisplay實體
+     */
+    public TextDisplay getCountdownDisplay() {
+        return countdownDisplay;
+    }
+    
+    /**
+     * 設定頭頂倒數計時顯示
+     * @param countdownDisplay 頭頂倒數計時TextDisplay實體
+     */
+    public void setCountdownDisplay(TextDisplay countdownDisplay) {
+        this.countdownDisplay = countdownDisplay;
     }
 }

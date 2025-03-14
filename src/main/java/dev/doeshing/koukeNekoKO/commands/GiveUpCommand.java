@@ -3,7 +3,7 @@ package dev.doeshing.koukeNekoKO.commands;
 import dev.doeshing.koukeNekoKO.KoukeNekoKO;
 import dev.doeshing.koukeNekoKO.core.bleeding.BleedingPlayerData;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,19 +23,24 @@ public class GiveUpCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         // 只有玩家可以使用此指令
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("此指令只能由玩家使用！", NamedTextColor.RED));
+            String prefix = plugin.getConfig().getString("prefix", "&8[&6KoukeNeko-KO&8] &r");
+            Component message = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + "&c此指令只能由玩家使用！");
+            sender.sendMessage(message);
             return true;
         }
 
         // 檢查玩家是否處於瀕死狀態
         if (!plugin.getBleedingManager().isPlayerBleeding(player.getUniqueId())) {
-            player.sendMessage(Component.text("你現在沒有處於瀕死狀態！", NamedTextColor.RED));
+            String prefix = plugin.getConfig().getString("prefix", "&8[&6KoukeNeko-KO&8] &r");
+            Component message = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + "&c你現在沒有處於瀕死狀態！");
+            player.sendMessage(message);
             return true;
         }
 
         // 顯示放棄急救的確認訊息
         String giveUpMessageRaw = plugin.getConfig().getString("bleeding.messages.give-up", "&c你已放棄急救，即將死亡...");
-        Component giveUpMessage = plugin.getBleedingManager().formatText(giveUpMessageRaw);
+        String prefix = plugin.getConfig().getString("prefix", "&8[&6KoukeNeko-KO&8] &r");
+        Component giveUpMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + giveUpMessageRaw);
         player.sendMessage(giveUpMessage);
         
         // 播放死亡前的音效
@@ -45,12 +50,6 @@ public class GiveUpCommand implements CommandExecutor {
         player.setMetadata("processingDeath", new org.bukkit.metadata.FixedMetadataValue(plugin, true));
         
         try {
-            // 恢復玩家原始位置和視角
-            BleedingPlayerData data = plugin.getBleedingManager().getBleedingPlayers().get(player.getUniqueId());
-            if (data != null && data.getOriginalLocation() != null) {
-                player.teleport(data.getOriginalLocation());
-            }
-            
             // 安全地移除瀕死狀態
             plugin.getBleedingManager().removeBleedingState(player.getUniqueId());
             

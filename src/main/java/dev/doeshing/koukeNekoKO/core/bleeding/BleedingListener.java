@@ -6,7 +6,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -67,7 +69,40 @@ public class BleedingListener implements Listener {
 
         Player rescuer = event.getPlayer();
 
+        // 檢查是否啟用右鍵救援
+        boolean rightClickEnabled = plugin.getConfig().getBoolean("bleeding.rescue-methods.right-click", true);
+        
+        // 如果右鍵救援被禁用，則直接返回
+        if (!rightClickEnabled) {
+            return;
+        }
+
         // 嘗試救援目標玩家
+        if (bleedingManager.isPlayerBleeding(target.getUniqueId())) {
+            event.setCancelled(true);
+            bleedingManager.attemptRescue(rescuer, target);
+        }
+    }
+
+    /**
+     * 監聽玩家左鍵點擊其他玩家的事件，嘗試救援
+     */
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerAttackEntity(EntityDamageByEntityEvent event) {
+        // 檢查是否是攻擊玩家，並且攻擊者也是玩家
+        if (!(event.getEntity() instanceof Player target) || !(event.getDamager() instanceof Player rescuer)) {
+            return;
+        }
+        
+        // 檢查是否啟用左鍵救援
+        boolean leftClickEnabled = plugin.getConfig().getBoolean("bleeding.rescue-methods.left-click", true);
+        
+        // 如果左鍵救援被禁用，則直接返回
+        if (!leftClickEnabled) {
+            return;
+        }
+        
+        // 如果目標玩家處於瀕死狀態，取消傷害並嘗試救援
         if (bleedingManager.isPlayerBleeding(target.getUniqueId())) {
             event.setCancelled(true);
             bleedingManager.attemptRescue(rescuer, target);
@@ -111,6 +146,24 @@ public class BleedingListener implements Listener {
                 // 確保一定會移除標記
                 player.removeMetadata("processingDeath", plugin);
             }
+        }
+    }
+    
+    /**
+     * 監聽玩家恢復生命值的事件，防止瀕死玩家自動回血
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerRegainHealth(EntityRegainHealthEvent event) {
+        Entity entity = event.getEntity();
+        
+        // 僅處理玩家實體
+        if (!(entity instanceof Player player)) {
+            return;
+        }
+        
+        // 如果玩家正處於瀕死狀態，取消任何生命值恢復
+        if (bleedingManager.isPlayerBleeding(player.getUniqueId())) {
+            event.setCancelled(true);
         }
     }
 }

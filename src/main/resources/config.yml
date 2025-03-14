@@ -1,5 +1,9 @@
 # KoukeNeko-KO 插件設定檔案
 
+# 訊息設定
+# 所有訊息的統一前綴
+prefix: "&8[&6KoukeNeko-KO&8] &r"
+
 # 瀕死相關設定
 bleeding:
   # 瀕死時間（秒）
@@ -14,6 +18,10 @@ bleeding:
     title: true
     title-text: "&c你正在流血！"
     subtitle-text: "&e需要隊友救援！"
+    
+    # 頭頂倒數計時的顯示
+    floating-countdown: true
+    floating-countdown-text: "&c瀕死倒數: &e{time} 秒"
 
     # 是否在瀕死玩家頭上顯示粒子效果
     particles: true
@@ -23,6 +31,13 @@ bleeding:
 
   # 瀕死狀態下玩家能否移動
   can-move: false
+  
+  # 救援方式設定
+  rescue-methods:
+    # 是否允許左鍵點擊救援
+    left-click: true
+    # 是否允許右鍵點擊救援
+    right-click: true
 
   # 救援提示資訊
   messages:
@@ -31,8 +46,13 @@ bleeding:
     bleeding-rescued: "&a你已被 {player} 成功救援！"
     bleeding-death: "&c你因失血過多而死亡！"
     give-up: "&c你已放棄急救，即將死亡..."
-
+    
+    # 新增 BossBar 相關的訊息
+    bleeding-bossbar: "&c你正在流血! &7- 剩餘時間: {time}秒"
+    head-countdown: "&c♥ &4{time} &c♥"
+    
     rescuer-start: "&a你正在救援 {player}！還需 {clicks} 次點選。"
     rescuer-success: "&a你成功救援了 {player}！"
+    rescuer-bossbar: "&a正在救援 {player} &7- &e點擊進度: {progress}/{total}"
     
     cannot-rescue-self: "&c你不能救援自己！"

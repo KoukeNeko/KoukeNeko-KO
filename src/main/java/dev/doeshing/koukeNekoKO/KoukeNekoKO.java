@@ -15,6 +15,8 @@ public final class KoukeNekoKO extends JavaPlugin {
         // 若 config.yml 尚未存在則複製預設配置
         saveDefaultConfig();
 
+
+
         // 初始化瀕死管理器
         bleedingManager = new BleedingManager(this);
 

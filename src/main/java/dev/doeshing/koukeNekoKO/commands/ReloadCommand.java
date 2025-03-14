@@ -2,7 +2,7 @@ package dev.doeshing.koukeNekoKO.commands;
 
 import dev.doeshing.koukeNekoKO.KoukeNekoKO;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +22,9 @@ public class ReloadCommand implements CommandExecutor {
         plugin.reloadConfig();
 
         // 使用 Adventure API 發送訊息
-        sender.sendMessage(Component.text("設定文件已重新載入！", NamedTextColor.GREEN));
+        String prefix = plugin.getConfig().getString("prefix", "&8[&6KoukeNeko-KO&8] &r");
+        Component message = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + "&a設定文件已重新載入！");
+        sender.sendMessage(message);
         return true;
     }
 }
