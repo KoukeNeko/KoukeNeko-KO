@@ -5,10 +5,7 @@ import dev.doeshing.koukeNekoKO.core.bleeding.BleedingPlayerData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -110,7 +107,7 @@ public class BleedingManager {
         // 創建瀕死狀態顯示的BossBar
         String bossBarTitle = plugin.getConfig().getString("bleeding.messages.bleeding-bossbar", "&c你正在流血! &7- 剩餘時間: {time}秒");
         BossBar bleedingBar = Bukkit.createBossBar(
-                LegacyComponentSerializer.legacyAmpersand().serialize(formatText(bossBarTitle.replace("{time}", String.valueOf(duration)))),
+                ChatColor.translateAlternateColorCodes('&', bossBarTitle.replace("{time}", String.valueOf(duration))),
                 BarColor.RED,
                 BarStyle.SOLID
         );
@@ -142,10 +139,7 @@ public class BleedingManager {
 
         // 設定玩家狀態
         player.setInvulnerable(true);
-        
-        // 讓玩家看起來像是倒在地上
-        // 保存原始位置以便救援後恢復
-        data.setOriginalLocation(player.getLocation().clone());
+
         
         // 調整玩家視角 - 讓玩家視角朝下，模擬倒地
         Location downLook = player.getLocation().clone();
@@ -330,9 +324,7 @@ public class BleedingManager {
 
         // 恢復玩家狀態
         restorePlayerState(player);
-        
-        // 不再恢復玩家原始位置和視角 (移除傳送回原地的機制)
-        // 玩家在救援後會停留在現在所在位置
+
 
         if (rescued) {
             // 如果被救援，恢復一半的生命值
@@ -572,6 +564,11 @@ public class BleedingManager {
         // 移除救援者的BossBar
         if (data.getRescuerBossBar() != null) {
             data.getRescuerBossBar().removeAll();
+        }
+
+        // 移除頭頂倒數計時顯示
+        if (data.getCountdownDisplay() != null && !data.getCountdownDisplay().isDead()) {
+            data.getCountdownDisplay().remove(); // 移除實體
         }
 
         // 從線上玩家獲取Player物件
